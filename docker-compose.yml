@@ -1,0 +1,48 @@
+version: '3.5'
+
+services:
+  database:
+    container_name: database
+    image: database
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      POSTGRES_USER: tcc
+      POSTGRES_PASSWORD: tcc
+      POSTGRES_DB: tcc
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+  
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: tcc@tcc.com
+      PGADMIN_DEFAULT_PASSWORD: tcc
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+
+    depends_on:
+      - database
+
+    ports:
+      - "16543:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:
